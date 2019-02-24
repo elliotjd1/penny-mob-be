@@ -18,6 +18,12 @@ class Location {
     action.location = this;
   }
 
+  getMobActions (mob) {
+    return _.filter(this.actions, action => {
+      return action.requirementsMet(mob);
+    });
+  }
+
   spreadInfluence (mob, amount) {
     const influence = this.getInfluence(mob);
     if (influence) {
