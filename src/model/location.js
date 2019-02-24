@@ -13,6 +13,11 @@ class Location {
     this.actions = [];
   }
 
+  addAction (action) {
+    this.actions.push(action);
+    action.location = this;
+  }
+
   spreadInfluence (mob, amount) {
     const influence = this.getInfluence(mob);
     if (influence) {
