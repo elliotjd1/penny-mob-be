@@ -18,7 +18,7 @@ class ResourceModifier {
 
   // Design Note: This allows potentially for negative resources.
   // If desired this could represent debt or a bad reputation.
-  modifyResources (mob) {
+  modify (mob) {
     mob.loot += this.lootMod;
     mob.power += this.powerMod;
     mob.heat += this.heatMod;
