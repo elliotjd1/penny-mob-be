@@ -8,7 +8,6 @@ class LocationUnownedBySource extends Requirement {
     if (location && sourceMob && location.ownedBy !== sourceMob) {
       return true;
     }
-    console.log('Requirement not met. Source owns this location.');
     return false;
   }
 }

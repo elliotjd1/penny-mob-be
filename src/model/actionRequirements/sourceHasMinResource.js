@@ -19,7 +19,6 @@ class SourceHasMinResource extends Requirement {
     if (sourceMob[this.resourceType] >= this.amount) {
       return true;
     }
-    console.log('Requirement not met. Source does not have enough ' + this.resourceType);
     return false;
   }
 }
