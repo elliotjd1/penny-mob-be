@@ -13,7 +13,7 @@ class Action {
   }
 
   execute (sourceMob, targetMob) {
-    console.log(sourceMob.name + ' performed ' + this.name + ' on ' + targetMob.name + '!');
+    console.log(sourceMob.name + ' performed ' + this.name + ' at ' + this.location.name + '!');
 
     if (!this.requirementsMet(sourceMob, targetMob)) {
       console.log(sourceMob.name + ' did not meet the requirements for this action and failed!');
@@ -23,9 +23,13 @@ class Action {
     _.forEach(this.sourceMods, mod => {
       mod.modify(sourceMob, this.location);
     });
-    _.forEach(this.targetMods, mod => {
-      mod.modify(targetMob, this.location);
-    });
+
+    if (targetMob) {
+      _.forEach(this.targetMods, mod => {
+        mod.modify(targetMob, this.location);
+      });
+    }
+
   }
 
   requirementsMet (sourceMob, targetMob) {
