@@ -12,28 +12,36 @@ const LocationOwnedBySource = require ('./src/model/actionRequirements/locationO
 const SourceHasMinResource = require ('./src/model/actionRequirements/sourceHasMinResource');
 
 
+console.log('\n\n\n=======Welcome to Penny Mob=====');
+
+const mobbo = new Mob('Mobbo');
+const theLads = new Mob('The Lads');
+
+console.log('Creating new mob: ' + mobbo.name);
+console.log('Creating new mob: ' + theLads.name);
+
+const digs = new Location('Digs', 'Where you live.', 10);
+console.log('Creating new Location: ' + digs.name);
+
+
+
 manage();
 function manage () {
-    gm = new GameManager ([1, 2, 3, 4, 5]);
-    console.log(gm);
-    gm.start
+    gm = new GameManager ([
+        new Mob('Mobbo'),
+        new Mob('The Lads'),
+        new Mob('Gregor\'s Gits')
+    ]);
+    gm.startGame();
+    for (let i = 0; i < 1; i++) {
+        gm.endTurn();
+        gm.executeAction(digs, new Action('Do it!', null, digs));
+    }
 }
 
 
-doSomeThings();
+// doSomeThings();
 function doSomeThings() {
-    console.log('\n\n\n=======Welcome to Penny Mob=====');
-
-    const mobbo = new Mob('Mobbo');
-    const theLads = new Mob('The Lads');
-
-    console.log('Creating new mob: ' + mobbo.name);
-    console.log('Creating new mob: ' + theLads.name);
-
-    const digs = new Location('Digs', 'Where you live.', 10);
-    console.log('Creating new Location: ' + digs.name);
-
-
     console.log('\n\n\n=======Spreading Influence=======');
     digs.spreadInfluence(mobbo, 5);
     digs.spreadInfluence(mobbo, 5);
