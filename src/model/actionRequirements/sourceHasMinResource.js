@@ -1,4 +1,4 @@
-const Requirement = require('./requirement').Requirement;
+const Requirement = require('./requirement');
 
 
 class SourceHasMinResource extends Requirement {
@@ -23,4 +23,4 @@ class SourceHasMinResource extends Requirement {
   }
 }
 
-module.exports = { SourceHasMinResource }
+module.exports = SourceHasMinResource

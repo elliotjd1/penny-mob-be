@@ -9,6 +9,4 @@ class InfluenceModifier {
 }
 
 
-module.exports = {
-  InfluenceModifier
-}
+module.exports = InfluenceModifier

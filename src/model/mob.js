@@ -19,6 +19,5 @@ class Mob {
   }
 }
 
-module.exports = {
-  Mob
-}
+module.exports = Mob
+

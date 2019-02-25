@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const LocationInfluence = require('./locationInfluence').LocationInfluence;
+const LocationInfluence = require('./locationInfluence');
 
 class Location {
   constructor (name, description, requiredInfluence) {
@@ -74,6 +74,4 @@ class Location {
 
 }
 
-module.exports = {
-  Location
-}
+module.exports = Location

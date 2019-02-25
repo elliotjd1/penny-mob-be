@@ -6,4 +6,4 @@ class Requirement {
   }
 }
 
-module.exports = { Requirement }
+module.exports = Requirement

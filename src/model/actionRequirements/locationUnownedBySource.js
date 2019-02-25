@@ -1,4 +1,4 @@
-const Requirement = require('./requirement').Requirement;
+const Requirement = require('./requirement');
 
 
 class LocationUnownedBySource extends Requirement {
@@ -12,4 +12,4 @@ class LocationUnownedBySource extends Requirement {
   }
 }
 
-module.exports = { LocationUnownedBySource }
+module.exports = LocationUnownedBySource

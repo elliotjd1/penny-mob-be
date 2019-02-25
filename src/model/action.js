@@ -35,6 +35,4 @@ class Action {
   }
 }
 
-module.exports = {
-  Action
-}
+module.exports = Action

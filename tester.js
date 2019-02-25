@@ -1,17 +1,26 @@
 const _ = require('lodash');
 
-const Mob = require('./src/model/mob').Mob;
-const Location = require('./src/model/location').Location;
-const Action = require('./src/model/action').Action;
-const ResourceModifier = require('./src/model/resourceModifier').ResourceModifier;
-const InfluenceModifier = require('./src/model/influenceModifier').InfluenceModifier;
+const GameManager = require('./src/model/gameManager');
+const Mob = require('./src/model/mob');
+const Location = require('./src/model/location');
+const Action = require('./src/model/action');
+const ResourceModifier = require('./src/model/resourceModifier');
+const InfluenceModifier = require('./src/model/influenceModifier');
 
-const LocationUnownedBySource = require ('./src/model/actionRequirements/locationUnownedBySource').LocationUnownedBySource;
-const LocationOwnedBySource = require ('./src/model/actionRequirements/locationOwnedBySource').LocationOwnedBySource;
-const SourceHasMinResource = require ('./src/model/actionRequirements/sourceHasMinResource').SourceHasMinResource;
+const LocationUnownedBySource = require ('./src/model/actionRequirements/locationUnownedBySource');
+const LocationOwnedBySource = require ('./src/model/actionRequirements/locationOwnedBySource');
+const SourceHasMinResource = require ('./src/model/actionRequirements/sourceHasMinResource');
 
 
+manage();
+function manage () {
+    gm = new GameManager ([1, 2, 3, 4, 5]);
+    console.log(gm);
+    gm.start
+}
 
+
+doSomeThings();
 function doSomeThings() {
     console.log('\n\n\n=======Welcome to Penny Mob=====');
 

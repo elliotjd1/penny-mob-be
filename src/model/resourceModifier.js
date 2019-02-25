@@ -29,6 +29,4 @@ class ResourceModifier {
 }
 
 
-module.exports = {
-  ResourceModifier
-}
+module.exports = ResourceModifier

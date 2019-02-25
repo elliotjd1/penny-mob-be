@@ -10,6 +10,4 @@ class LocationInfluence {
   }
 }
 
-module.exports = {
-  LocationInfluence
-}
+module.exports = LocationInfluence
