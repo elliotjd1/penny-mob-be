@@ -16,40 +16,44 @@ console.log('\n\n\n=======Welcome to Penny Mob=====');
 
 const mobbo = new Mob('Mobbo');
 const theLads = new Mob('The Lads');
-
 console.log('Creating new mob: ' + mobbo.name);
 console.log('Creating new mob: ' + theLads.name);
 
 const digs = new Location('Digs', 'Where you live.', 10);
 console.log('Creating new Location: ' + digs.name);
 
+const freeInfluence = new Action('Spread Influence');
+freeInfluence.sourceMods.push(new InfluenceModifier(5));
+console.log('Creating new Action: ' + freeInfluence.name);
+
+digs.addAction(freeInfluence);
 
 
-// manage();
+manage();
 function manage () {
     gm = new GameManager ([
         new Mob('Mobbo'),
         new Mob('The Lads'),
         new Mob('Gregor\'s Gits')
     ], [
-        new Location('Digs', null, 5),
-        new Location('Docks', null, 5),
-        new Location('Cemetary', null, 5),
-        new Location('Warehouse', null, 5),
-        new Location('Orphanage', null, 5),
-        new Location('Pub', null, 5),
+        digs,
+        new Location('Docks', 'Boats \'n hoes', 5),
+        new Location('Cemetary', 'Deaders and whatnot.', 5),
+        new Location('Warehouse', 'Ware! Where?', 5),
+        new Location('Orphanage', 'Bastard laden.', 5),
+        new Location('Pub', 'Time for a pint.', 5)
     ]);
-    const influence = new Action('Spread Influence');   // are actions unique instances to buildings or can they be shared..?
+
     gm.startGame();
-    for (let i = 0; i < 0; i++) {
-        gm.endTurn();
-        gm.executeAction(digs, new Action('Do it!', null, digs));   // why is location in there twice eh? that doesnt make sense..
+    for (let i = 0; i < 3; i++) {
+        gm.executeAction(digs, freeInfluence);
     }
-    gm.getState();
+    const gameState = gm.getState();
+    console.log(gameState);
 }
 
 
-doSomeThings();
+// doSomeThings();
 function doSomeThings() {
 
     console.log('\n\n\n=======Distributing Loot=======');
