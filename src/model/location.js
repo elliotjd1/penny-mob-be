@@ -15,12 +15,11 @@ class Location {
 
   addAction (action) {
     this.actions.push(action);
-    action.location = this;
   }
 
   getMobActions (mob) {
     return _.filter(this.actions, action => {
-      return action.requirementsMet(mob);
+      return action.requirementsMet(this, mob);
     });
   }
 

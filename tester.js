@@ -25,23 +25,39 @@ console.log('Creating new Location: ' + digs.name);
 
 
 
-manage();
+// manage();
 function manage () {
     gm = new GameManager ([
         new Mob('Mobbo'),
         new Mob('The Lads'),
         new Mob('Gregor\'s Gits')
+    ], [
+        new Location('Digs', null, 5),
+        new Location('Docks', null, 5),
+        new Location('Cemetary', null, 5),
+        new Location('Warehouse', null, 5),
+        new Location('Orphanage', null, 5),
+        new Location('Pub', null, 5),
     ]);
+    const influence = new Action('Spread Influence');   // are actions unique instances to buildings or can they be shared..?
     gm.startGame();
-    for (let i = 0; i < 1; i++) {
+    for (let i = 0; i < 0; i++) {
         gm.endTurn();
-        gm.executeAction(digs, new Action('Do it!', null, digs));
+        gm.executeAction(digs, new Action('Do it!', null, digs));   // why is location in there twice eh? that doesnt make sense..
     }
+    gm.getState();
 }
 
 
-// doSomeThings();
+doSomeThings();
 function doSomeThings() {
+
+    console.log('\n\n\n=======Distributing Loot=======');
+    mobbo.loot = 30;
+    theLads.loot = 30;
+    console.log('-Mobbos Loot: ' + mobbo.loot);
+    console.log('-The Lads Loot: ' + mobbo.loot);
+
     console.log('\n\n\n=======Spreading Influence=======');
     digs.spreadInfluence(mobbo, 5);
     digs.spreadInfluence(mobbo, 5);
@@ -58,14 +74,6 @@ function doSomeThings() {
     _.forEach(theLads.locations, loc => {console.log('--' + loc.name);});
     console.log('Mobbos Influence: ' + digs.getInfluence(mobbo).amount);
     console.log('The Lads Influence: ' + digs.getInfluence(theLads).amount);
-
-
-    console.log('\n\n\n=======Distributing Loot=======');
-    mobbo.loot = 30;
-    theLads.loot = 30;
-    console.log('-Mobbos Loot: ' + mobbo.loot);
-    console.log('-The Lads Loot: ' + mobbo.loot);
-
 
     console.log('\n\n\n=======Actions=======');
     // Create Heist
@@ -107,21 +115,21 @@ function doSomeThings() {
     _.forEach(theLadsActions, action => {console.log('--' + action.name);});
 
     console.log('\n===Round1 - Getting in the Door===');
-    infl.execute(mobbo, theLads);
+    infl.execute(digs, mobbo, theLads);
     console.log('-Mobbos Loot: ' + mobbo.loot);
     console.log('-The Lads Loot: ' + theLads.loot);
     console.log('Mobbos Influence: ' + digs.getInfluence(mobbo).amount);
     console.log('The Lads Influence: ' + digs.getInfluence(theLads).amount);
 
     console.log('\n===Round2 - The Celebration===');
-    produce.execute(theLads, mobbo);
+    produce.execute(digs, theLads, mobbo);
     console.log('-Mobbos Loot: ' + mobbo.loot);
     console.log('-The Lads Loot: ' + theLads.loot);
     console.log('Mobbos Influence: ' + digs.getInfluence(mobbo).amount);
     console.log('The Lads Influence: ' + digs.getInfluence(theLads).amount);
 
     console.log('\n===Round3 - The Heist===');
-    heist.execute(mobbo, theLads);
+    heist.execute(digs, mobbo, theLads);
     console.log('-Mobbos Loot: ' + mobbo.loot);
     console.log('-The Lads Loot: ' + theLads.loot);
     console.log('Mobbos Influence: ' + digs.getInfluence(mobbo).amount);
@@ -130,7 +138,7 @@ function doSomeThings() {
     console.log('\n===Round4 - The Lads Accidentally Click End Turn A Bit Prematurely===');
 
     console.log('\n===Round5 - The Puppet Show===');
-    infl2.execute(mobbo, theLads);
+    infl2.execute(digs, mobbo, theLads);
     console.log('-Mobbos Loot: ' + mobbo.loot);
     console.log('-The Lads Loot: ' + theLads.loot);
     console.log('Mobbo owns ' + mobbo.locations.length + ' locations');

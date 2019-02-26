@@ -2,39 +2,38 @@ const _ = require('lodash');
 
 
 class Action {
-  constructor (name, description, location) {
+  constructor (name, description) {
     this.name = name;
     this.description = description;
-    this.location = location;
     this.sourceMods = [];
     this.targetMods = [];
 
     this.requirements = [];
   }
 
-  execute (sourceMob, targetMob) {
-    console.log(sourceMob.name + ' performed ' + this.name + ' at ' + this.location.name + '!');
+  execute (location, sourceMob, targetMob) {
+    console.log(sourceMob.name + ' performed ' + this.name + ' at ' + location.name + '!');
 
-    if (!this.requirementsMet(sourceMob, targetMob)) {
+    if (!this.requirementsMet(location, sourceMob, targetMob)) {
       console.log(sourceMob.name + ' did not meet the requirements for this action and failed!');
       return;
     }
 
     _.forEach(this.sourceMods, mod => {
-      mod.modify(sourceMob, this.location);
+      mod.modify(sourceMob, location);
     });
 
     if (targetMob) {
       _.forEach(this.targetMods, mod => {
-        mod.modify(targetMob, this.location);
+        mod.modify(targetMob, location);
       });
     }
 
   }
 
-  requirementsMet (sourceMob, targetMob) {
+  requirementsMet (location, sourceMob, targetMob) {
     return _.every(this.requirements, requirement => {
-      return requirement.isMet(this.location, sourceMob, targetMob);
+      return requirement.isMet(location, sourceMob, targetMob);
     });
   }
 }
