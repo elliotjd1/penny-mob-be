@@ -1,11 +1,11 @@
 const io = require('socket.io')();
-
-const GameManager = require('./model/gameManager');
+const tesLoader = require('../data/testLoader');
 
 
 io.on('connection', client => { 
   console.log('connecting is happening...');
-  const gm = loadTestGameManager();
+
+  const gm = tesLoader.getGameManager();
   gm.startGame();
 
   client.emit('state', gm.getState());
@@ -25,16 +25,3 @@ io.on('connection', client => {
 
 
 io.listen(1612);
-
-
-function loadTestGameManager() {
-  const Mob = require('./model/mob');
-  const Location = require('./model/location');
-  return new GameManager([
-    new Mob('Mobbo'),
-    new Mob('The Lads')
-  ], {
-    digs: new Location('digs', 'Digs', 'Where you live.', 10),
-    docks: new Location('docks', 'Docks', 'Boats \'n hoes', 5)
-  });
-}
