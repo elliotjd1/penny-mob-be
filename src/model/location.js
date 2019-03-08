@@ -2,7 +2,8 @@ const _ = require('lodash');
 const LocationInfluence = require('./locationInfluence');
 
 class Location {
-  constructor (name, description, requiredInfluence) {
+  constructor (id, name, description, requiredInfluence) {
+    this.id = id;
     this.name = name;
     this.description = description;
     this.requiredInfluence = requiredInfluence;

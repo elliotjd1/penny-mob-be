@@ -19,7 +19,7 @@ const theLads = new Mob('The Lads');
 console.log('Creating new mob: ' + mobbo.name);
 console.log('Creating new mob: ' + theLads.name);
 
-const digs = new Location('Digs', 'Where you live.', 10);
+const digs = new Location('digs', 'Digs', 'Where you live.', 10);
 console.log('Creating new Location: ' + digs.name);
 
 const freeInfluence = new Action('Spread Influence');
@@ -35,18 +35,18 @@ function manage () {
         new Mob('Mobbo'),
         new Mob('The Lads'),
         new Mob('Gregor\'s Gits')
-    ], [
-        digs,
-        new Location('Docks', 'Boats \'n hoes', 5),
-        new Location('Cemetary', 'Deaders and whatnot.', 5),
-        new Location('Warehouse', 'Ware! Where?', 5),
-        new Location('Orphanage', 'Bastard laden.', 5),
-        new Location('Pub', 'Time for a pint.', 5)
-    ]);
+    ], {
+        digs: digs,
+        docks: new Location('docks', 'Docks', 'Boats \'n hoes', 5),
+        cemetary: new Location('cemetary', 'Cemetary', 'Deaders and whatnot.', 5),
+        warehouse: new Location('warehouse', 'Warehouse', 'Ware! Where?', 5),
+        orphanage: new Location('orphanage', 'Orphanage', 'Bastard laden.', 5),
+        pub: new Location('pub', 'Pub', 'Time for a pint.', 5)
+    });
 
     gm.startGame();
     for (let i = 0; i < 3; i++) {
-        gm.executeAction(digs, freeInfluence);
+        gm.executeAction('digs', freeInfluence);
     }
     const gameState = gm.getState();
     console.log(gameState);

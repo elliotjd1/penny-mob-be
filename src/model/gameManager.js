@@ -23,7 +23,7 @@ class GameManager {
             throw new Error('NO!');
         }
         // TODO get target if applicable
-        action.execute(location, this.activeMob);
+        action.execute(this.locations[location], this.activeMob);
     }
 
     endTurn () {
@@ -33,7 +33,6 @@ class GameManager {
         this.actionsTaken = 0;
     }
 
-    // TODO some kind of id system would work better than referencing names/titles
     getState () {
         const mobs = _.map(this.mobs, mob => {
             return {
@@ -45,18 +44,20 @@ class GameManager {
                 urchins: mob.urchins,
                 connections: mob.connections,
                 locations: _.map(mob.locations, loc => {
-                    return loc.name
+                    return loc.id
                 })
             }
         });
 
-        const locations = _.map(this.locations, loc => {
-            return {
+        const locations = {}
+        _.forEach(this.locations, (loc, id) => {
+            locations[id] = {
+                id: id,
                 name: loc.name,
                 description: loc.description,
                 requiredInfluence: loc.requiredInfluence,
                 ownedBy: loc.ownedBy ? loc.ownedBy.name : null,
-                availableActions: _.map(loc.getMobActions(this.activeMob), action => {
+                availableActions: _.map(loc.getMobActions(this.activeMob), action => {  // TODO actions should also be sorted by key
                     return action.name;
                 }),
                 allActions: _.map(loc.actions, action => {
