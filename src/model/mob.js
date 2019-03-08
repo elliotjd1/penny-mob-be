@@ -1,5 +1,6 @@
 class Mob {
   constructor (name) {
+    this.id = null;
     this.name = name;
 
     this.loot = 0;

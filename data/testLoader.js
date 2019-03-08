@@ -9,11 +9,7 @@ const InfluenceModifier = require('../src/model/influenceModifier');
 
 
 function getGameManager () {
-    const gm = new GameManager ([
-        new Mob('Mobbo'),
-        new Mob('The Lads'),
-        new Mob('Gregor\'s Gits')
-    ], {
+    const gm = new GameManager ({
         merchantDistrict: new Location('merchantDistrict', 'Merchant District', 'Guid gear comes in sma\' bulk', 30, [539,628,885,751]),
         retailDistrict: new Location('retailDistrict', 'Retail District', 'Guid gear comes in sma\' bulk', 30, [893,528,1119,695]),
         financialDistrict: new Location('financialDistrict', 'Financial District', 'Guid gear comes in sma\' bulk', 30, [745,759,744,952,915,955,916,704,893,704,890,756]),
@@ -38,6 +34,10 @@ function getGameManager () {
         bishopbriggs: new Location('bishopbriggs', 'Bishopbriggs', 'Lang may yer lum reek!', 30, [697,184,694,462,882,462,885,341,930,341,930,261,845,263,842,183]),
         dumbartonshire: new Location('dumbartonshire', 'Dumbartonshire', 'Yer aff yer heid!', 30, [567,33,566,164,692,168,694,179,792,178,798,32]),
     });
+
+    gm.addMob(new Mob('Mobbo'))
+    gm.addMob(new Mob('The Lads'))
+    gm.addMob(new Mob('Gregor\'s Gits'))
 
     const spreadInfluence = new Action('spreadInfluence', 'Grease Some Palms', 'Spend a little loot to gain some influence.');
     spreadInfluence.sourceMods.push(new InfluenceModifier(5));

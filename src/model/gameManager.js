@@ -2,18 +2,26 @@ const _ = require('lodash');
 
 
 class GameManager {
-    constructor (mobs, locations) {
+    constructor (locations) {
         this.turn = 0;
         this.activeMob = null;
+        this.turnOrder = [];
         this.actionsTaken = 0;
         this.actionsLimit = 3;
-        this.mobs = mobs;
+        this.mobs = {};
         this.locations = locations;
     }
 
     startGame () {
-        this.mobs = _.shuffle(this.mobs);
+        const players = Object.keys(this.mobs);
+        this.turnOrder = _.shuffle(players);
         this.endTurn();
+    }
+
+    addMob (mob) {
+        const id = 'player' + Object.keys(this.mobs).length;
+        mob.id = id;
+        this.mobs[id] = mob;
     }
 
     executeAction (location, action) {
@@ -27,7 +35,8 @@ class GameManager {
     }
 
     endTurn () {
-        this.activeMob = this.mobs[this.turn % this.mobs.length];
+        const nextMob = this.turnOrder[this.turn % this.turnOrder.length];
+        this.activeMob = this.mobs[nextMob];
         console.log('Turn ' + this.turn + '. Player: ' + this.activeMob.name);
         this.turn++;
         this.actionsTaken = 0;
@@ -70,20 +79,30 @@ class GameManager {
         }
     }
 
+    getMobDetail (id) {
+        const mob = this.mobs[id];
+        if (!mob) {
+            return null;
+        }
+        return {
+            id: mob.id,
+            name: mob.name,
+            loot: mob.loot,
+            power: mob.power,
+            heat: mob.heat,
+            thugs: mob.thugs,
+            urchins: mob.urchins,
+            connections: mob.connections,
+            locations: _.map(mob.locations, loc => {
+                return loc.id
+            })
+        }
+    }
+
     getState () {
-        const mobs = _.map(this.mobs, mob => {
-            return {
-                name: mob.name,
-                loot: mob.loot,
-                power: mob.power,
-                heat: mob.heat,
-                thugs: mob.thugs,
-                urchins: mob.urchins,
-                connections: mob.connections,
-                locations: _.map(mob.locations, loc => {
-                    return loc.id
-                })
-            }
+        const mobs = {};
+        _.forEach(this.mobs, (mob, id) => {
+            mobs[id] = this.getMobDetail(id);
         });
 
         const locations = {};
@@ -93,7 +112,7 @@ class GameManager {
 
         const gameState = {
             turn: this.turn,
-            activeMob: this.activeMob.name,
+            activeMob: this.activeMob.id,
             actionsTaken: this.actionsTaken,
             actionLimit: this.actionsLimit,
             mobs: mobs,
