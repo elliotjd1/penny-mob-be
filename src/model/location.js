@@ -10,12 +10,13 @@ class Location {
 
     this.influences = [];
     this.ownedBy = null;
+    this.actions = {};
 
-    this.actions = [];
+    this.coordinates = []
   }
 
   addAction (action) {
-    this.actions.push(action);
+    this.actions[action.id] = action;
   }
 
   getMobActions (mob) {
