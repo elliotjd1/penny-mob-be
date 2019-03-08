@@ -50,6 +50,7 @@ function manage () {
     }
     const gameState = gm.getState();
     console.log(gameState);
+    console.log(gm.getLocationDetail('digs'));
 }
 
 

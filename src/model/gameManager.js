@@ -33,6 +33,43 @@ class GameManager {
         this.actionsTaken = 0;
     }
 
+    getLocationDetail (id) {
+        const loc = this.locations[id];
+        if (!loc) {
+            return null;
+        }
+        return {
+            id: id,
+            name: loc.name,
+            description: loc.description,
+            requiredInfluence: loc.requiredInfluence,
+            ownedBy: loc.ownedBy ? loc.ownedBy.name : null,
+            availableActions: loc.getMobActions(this.activeMob),
+            allActions: _.map(loc.actions, action => {
+                return action.name;
+            }),
+            influences: _.map(loc.influences, inf => {
+                return {
+                    mob: inf.mob.name,
+                    amount: inf.amount
+                }
+            })
+        }
+    }
+
+    getLocationGeneral (id) {
+        const loc = this.locations[id];
+        if (!loc) {
+            return null;
+        }
+        return {
+            id: id,
+            name: loc.name,
+            coordinates: loc.coordinates,
+            ownedBy: loc.ownedBy ? loc.ownedBy.name : null
+        }
+    }
+
     getState () {
         const mobs = _.map(this.mobs, mob => {
             return {
@@ -49,27 +86,9 @@ class GameManager {
             }
         });
 
-        const locations = {}
+        const locations = {};
         _.forEach(this.locations, (loc, id) => {
-            locations[id] = {
-                id: id,
-                name: loc.name,
-                description: loc.description,
-                requiredInfluence: loc.requiredInfluence,
-                ownedBy: loc.ownedBy ? loc.ownedBy.name : null,
-                availableActions: _.map(loc.getMobActions(this.activeMob), action => {  // TODO actions should also be sorted by key
-                    return action.name;
-                }),
-                allActions: _.map(loc.actions, action => {
-                    return action.name;
-                }),
-                influences: _.map(loc.influences, inf => {
-                    return {
-                        mob: inf.mob.name,
-                        amount: inf.amount
-                    }
-                })
-            }
+            locations[id] = this.getLocationGeneral(id);
         });
 
         const gameState = {
