@@ -14,22 +14,29 @@ const SourceHasMinResource = require ('./src/model/actionRequirements/sourceHasM
 
 console.log('\n\n\n=======Welcome to Penny Mob=====');
 
-const mobbo = new Mob('Mobbo');
-const theLads = new Mob('The Lads');
-console.log('Creating new mob: ' + mobbo.name);
-console.log('Creating new mob: ' + theLads.name);
+// const mobbo = new Mob('Mobbo');
+// const theLads = new Mob('The Lads');
+// console.log('Creating new mob: ' + mobbo.name);
+// console.log('Creating new mob: ' + theLads.name);
 
-const digs = new Location('digs', 'Digs', 'Where you live.', 10);
-console.log('Creating new Location: ' + digs.name);
+// const digs = new Location('digs', 'Digs', 'Where you live.', 10);
+// console.log('Creating new Location: ' + digs.name);
 
-const freeInfluence = new Action('Spread Influence');
-freeInfluence.sourceMods.push(new InfluenceModifier(5));
-console.log('Creating new Action: ' + freeInfluence.name);
+// const freeInfluence = new Action('Spread Influence');
+// freeInfluence.sourceMods.push(new InfluenceModifier(5));
+// console.log('Creating new Action: ' + freeInfluence.name);
 
-digs.addAction(freeInfluence);
+// digs.addAction(freeInfluence);
 
 
-manage();
+const testloader = require('./data/testLoader');
+const gm = testloader.getGameManager();
+gm.startGame();
+console.log(gm.getState());
+console.log(gm.getLocationDetail('barrowland'));
+
+
+// manage();
 function manage () {
     gm = new GameManager ([
         new Mob('Mobbo'),
