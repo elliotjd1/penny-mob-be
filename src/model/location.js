@@ -2,7 +2,7 @@ const _ = require('lodash');
 const LocationInfluence = require('./locationInfluence');
 
 class Location {
-  constructor (id, name, description, requiredInfluence) {
+  constructor (id, name, description, requiredInfluence, coordinates) {
     this.id = id;
     this.name = name;
     this.description = description;
@@ -12,7 +12,7 @@ class Location {
     this.ownedBy = null;
     this.actions = {};
 
-    this.coordinates = []
+    this.coordinates = coordinates ? coordinates : []
   }
 
   addAction (action) {

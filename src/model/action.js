@@ -2,7 +2,8 @@ const _ = require('lodash');
 
 
 class Action {
-  constructor (name, description) {
+  constructor (id, name, description) { // TODO object might be better here...
+    this.id = id;
     this.name = name;
     this.description = description;
     this.sourceMods = [];

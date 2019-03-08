@@ -46,7 +46,7 @@ class GameManager {
             ownedBy: loc.ownedBy ? loc.ownedBy.name : null,
             availableActions: loc.getMobActions(this.activeMob),
             allActions: _.map(loc.actions, action => {
-                return action.name;
+                return action.id;
             }),
             influences: _.map(loc.influences, inf => {
                 return {
