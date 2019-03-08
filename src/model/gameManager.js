@@ -52,14 +52,14 @@ class GameManager {
             name: loc.name,
             description: loc.description,
             requiredInfluence: loc.requiredInfluence,
-            ownedBy: loc.ownedBy ? loc.ownedBy.name : null,
+            ownedBy: loc.ownedBy ? loc.ownedBy.id : null,
             availableActions: loc.getMobActions(this.activeMob),
             allActions: _.map(loc.actions, action => {
                 return action.id;
             }),
             influences: _.map(loc.influences, inf => {
                 return {
-                    mob: inf.mob.name,
+                    mob: inf.mob.id,
                     amount: inf.amount
                 }
             })
@@ -75,7 +75,7 @@ class GameManager {
             id: id,
             name: loc.name,
             coordinates: loc.coordinates,
-            ownedBy: loc.ownedBy ? loc.ownedBy.name : null
+            ownedBy: loc.ownedBy ? loc.ownedBy.id : null
         }
     }
 
