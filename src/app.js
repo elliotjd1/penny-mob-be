@@ -14,11 +14,14 @@ io.on('connection', client => {
     console.log(payload);
     const location = gm.getLocationDetail(payload.location);
     client.emit('locationServe', location);
+    io.emit('state', gm.getState());
   });
 
-  client.on('something', payload => {
-    console.log('the payload');
+  client.on('locationAction', payload => {
+    console.log('doing an action');
     console.log(payload);
+    gm.executeAction(payload.location, payload.action);
+    io.emit('state', gm.getState());
   });
 
 });
