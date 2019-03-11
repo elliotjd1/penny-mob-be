@@ -1,6 +1,7 @@
 const io = require('socket.io')();
 const tesLoader = require('../data/testLoader');
 
+io.origins(['*:*']);
 
 io.on('connection', client => { 
   console.log('connecting is happening...');
