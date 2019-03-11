@@ -24,14 +24,24 @@ class GameManager {
         this.mobs[id] = mob;
     }
 
-    executeAction (location, action) {
-        // TODO check that action is valid for current mob in this location
+    executeAction (locationId, actionId) {
         this.actionsTaken++;
         if (this.actionsTaken > this.actionsLimit) {
-            throw new Error('NO!');
+            throw ('Exceeded maximum number of actions for this turn.');
         }
+
         // TODO get target if applicable
-        action.execute(this.locations[location], this.activeMob);
+
+        const location = this.locations[locationId];
+        const action = location.actions[actionId];
+        if (!location) {
+            throw 'Location not found';
+        }
+        if (!action) { // TODO check that action is valid for current mob in this location
+            throw 'Action is not valid for this location/mob.';
+        }
+        
+        action.execute(location, this.activeMob);
     }
 
     endTurn () {

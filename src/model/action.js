@@ -2,7 +2,7 @@ const _ = require('lodash');
 
 
 class Action {
-  constructor (id, name, description) { // TODO object might be better here...
+  constructor (id, name, description) {
     this.id = id;
     this.name = name;
     this.description = description;
@@ -16,8 +16,7 @@ class Action {
     console.log(sourceMob.name + ' performed ' + this.name + ' at ' + location.name + '!');
 
     if (!this.requirementsMet(location, sourceMob, targetMob)) {
-      console.log(sourceMob.name + ' did not meet the requirements for this action and failed!');
-      return;
+      throw sourceMob.name + ' did not meet the requirements for this action and failed!';
     }
 
     _.forEach(this.sourceMods, mod => {
