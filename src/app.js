@@ -10,7 +10,7 @@ io.on('connection', client => {
 
   const gm = tesLoader.getGameManager();
   gm.startGame();
-  client.emit('state', gm.getState());
+  client.emit('state', {status: 'success', payload: gm.getState()});
 
 
   client.on('locationSelect', payload => {
@@ -20,10 +20,9 @@ io.on('connection', client => {
     try {
       const location = gm.getLocationDetail(payload.location);
       client.emit('locationServe', {status: 'success', payload: location});
-      io.emit('state', {status: 'success', payload: gm.getState()});
     } catch (err) {
       console.log(err);
-      io.emit('state', {status: 'error', payload: err});
+      client.emit('state', {status: 'error', payload: err});
     }
   });
 
@@ -37,7 +36,7 @@ io.on('connection', client => {
       io.emit('state', {status: 'success', payload: gm.getState()});
     } catch (err) {
       console.log(err);
-      io.emit('state', {status: 'error', payload: err});
+      client.emit('state', {status: 'error', payload: err});
     }
   });
 
@@ -52,7 +51,7 @@ io.on('connection', client => {
       // TODO tell the next person it is their turn?
     } catch (err) {
       console.log(err);
-      io.emit('state', {status: 'error', payload: err});
+      client.emit('state', {status: 'error', payload: err});
     }
   });
 });
