@@ -1,24 +1,23 @@
 const io = require('socket.io')();
-const tesLoader = require('../data/testLoader');
+const Room = require('./model/room');
+const room = new Room('room1', '1234'); // TODO support for multiple rooms
+
 
 io.origins(['*:*']);
 
 
 io.on('connection', client => { 
-  console.log('connecting is happening...');
+  console.log(`establishing connection for ${client.id}...`);
 
-
-  const gm = tesLoader.getGameManager();
-  gm.startGame();
-  client.emit('state', {status: 'success', payload: gm.getState()});
-
+  room.joinRoom(client.id);
+  client.emit('state', {status: 'success', payload: room.gm.getState()});
 
   client.on('locationSelect', payload => {
     console.log('fetching location information')
     console.log(payload);
     
     try {
-      const location = gm.getLocationDetail(payload.location);
+      const location = room.gm.getLocationDetail(payload.location);
       client.emit('locationServe', {status: 'success', payload: location});
     } catch (err) {
       console.log(err);
@@ -28,12 +27,12 @@ io.on('connection', client => {
 
 
   client.on('locationAction', payload => {
-    console.log('doing an action');
+    console.log('trying to perform an action...');
     console.log(payload);
 
     try {
-      gm.executeAction(payload.location, payload.action);
-      io.emit('state', {status: 'success', payload: gm.getState()});
+      room.gm.executeAction(payload.location, payload.action);
+      io.emit('state', {status: 'success', payload: room.gm.getState()});
     } catch (err) {
       console.log(err);
       client.emit('state', {status: 'error', payload: err});
@@ -46,8 +45,8 @@ io.on('connection', client => {
     console.log(payload);
 
     try {
-      gm.endTurn();
-      io.emit('state', {status: 'success', payload: gm.getState()});
+      room.gm.endTurn();
+      io.emit('state', {status: 'success', payload: room.gm.getState()});
       // TODO tell the next person it is their turn?
     } catch (err) {
       console.log(err);
