@@ -2,14 +2,14 @@ const io = require('socket.io')();
 const Room = require('./model/room');
 const room = new Room('room1', '1234'); // TODO support for multiple rooms
 
-
 io.origins(['*:*']);
 
 
 io.on('connection', client => { 
-  console.log(`establishing connection for ${client.id}...`);
+  const player = client.id;
+  console.log(`establishing connection for ${player}...`);
 
-  room.joinRoom(client.id);
+  room.joinRoom(player);
   client.emit('state', {status: 'success', payload: room.gm.getState()});
 
   client.on('locationSelect', payload => {
@@ -17,7 +17,7 @@ io.on('connection', client => {
     console.log(payload);
     
     try {
-      const location = room.gm.getLocationDetail(payload.location);
+      const location = room.gm.getLocationDetail(player, payload.location);
       client.emit('locationServe', {status: 'success', payload: location});
     } catch (err) {
       console.log(err);
@@ -31,7 +31,7 @@ io.on('connection', client => {
     console.log(payload);
 
     try {
-      room.gm.executeAction(payload.location, payload.action);
+      room.gm.executeAction(player, payload.location, payload.action);
       io.emit('state', {status: 'success', payload: room.gm.getState()});
     } catch (err) {
       console.log(err);
@@ -41,11 +41,10 @@ io.on('connection', client => {
 
 
   client.on('endTurn', payload => {
-    console.log('ending the turn');
     console.log(payload);
 
     try {
-      room.gm.endTurn();
+      room.gm.endTurn(player);
       io.emit('state', {status: 'success', payload: room.gm.getState()});
       // TODO tell the next person it is their turn?
     } catch (err) {

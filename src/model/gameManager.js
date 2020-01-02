@@ -7,7 +7,7 @@ class GameManager {
     constructor () {
         this.turn = 0;
         this.gameStarted = false;
-        this.activeMob = null;
+        this.activePlayer = null;
         this.turnOrder = [];
         this.actionsTaken = 0;
         this.actionsLimit = 3;
@@ -32,10 +32,14 @@ class GameManager {
         this.mobs[player] = mob;
     }
 
-    executeAction (locationId, actionId) {
+    executeAction (sourcePlayer, locationId, actionId) {
+        if (this.activePlayer && sourcePlayer != this.activePlayer.id) {
+            console.log(`${sourcePlayer} tried to action on ${this.activePlayer.id}'s turn`);
+            throw 'It is not your turn, you cannot perform any action';
+        }
         this.actionsTaken++;
         if (this.actionsTaken > this.actionsLimit) {
-            throw ('Exceeded maximum number of actions for this turn.');
+            throw 'Exceeded maximum number of actions for this turn.';
         }
 
         // TODO get target if applicable
@@ -49,18 +53,21 @@ class GameManager {
             throw 'Action is not valid for this location/mob.';
         }
         
-        action.execute(location, this.activeMob);
+        action.execute(location, this.activePlayer);
     }
 
-    endTurn () {
+    endTurn (sourcePlayer) {
+        if (this.activePlayer && sourcePlayer != this.activePlayer.id) {
+            throw 'It is not your turn, you cannot perform any action';
+        }
         const nextMob = this.turnOrder[this.turn % this.turnOrder.length];
-        this.activeMob = this.mobs[nextMob];
+        this.activePlayer = this.mobs[nextMob];
         this.turn++;
         this.actionsTaken = 0;
-        console.log(`Turn ${this.turn} Player: ${this.activeMob.name}`);
+        console.log(`Turn ${this.turn} Player: ${this.activePlayer.name}`);
     }
 
-    getLocationDetail (id) {
+    getLocationDetail (sourcePlayer, id) {
         const loc = this.locations[id];
         if (!loc) {
             return null;
@@ -71,7 +78,7 @@ class GameManager {
             description: loc.description,
             requiredInfluence: loc.requiredInfluence,
             ownedBy: loc.ownedBy ? loc.ownedBy.id : null,
-            availableActions: loc.getMobActions(this.activeMob),
+            availableActions: loc.getMobActions(this.activePlayer),
             allActions: _.map(loc.actions, action => {
                 return action.id;
             }),
@@ -131,7 +138,7 @@ class GameManager {
         const gameState = {
             gameStarted: this.gameStarted,
             turn: this.turn,
-            activeMob: this.activeMob ? this.activeMob.id : null,
+            activePlayer: this.activePlayer ? this.activePlayer.id : null,
             actionsTaken: this.actionsTaken,
             actionLimit: this.actionsLimit,
             mobs: mobs,
