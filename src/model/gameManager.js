@@ -1,27 +1,35 @@
 const _ = require('lodash');
+const DataLoader = require('../../data/dataLoader');
+const Mob = require('./mob');
 
 
 class GameManager {
-    constructor (locations) {
+    constructor () {
         this.turn = 0;
+        this.gameStarted = false;
         this.activeMob = null;
         this.turnOrder = [];
         this.actionsTaken = 0;
         this.actionsLimit = 3;
+
+        this.data = new DataLoader();
+        this.locations = this.data.locations;
         this.mobs = {};
-        this.locations = locations;
     }
 
     startGame () {
+        console.log('Starting new game...');
+        console.log(`Players: ${this.mobNameList().join(', ')}`)
+        this.gameStarted = true;
         const players = Object.keys(this.mobs);
         this.turnOrder = _.shuffle(players);
         this.endTurn();
     }
 
-    addMob (mob) {
-        const id = 'player' + Object.keys(this.mobs).length;
-        mob.id = id;
-        this.mobs[id] = mob;
+    addMob (player) {
+        const mob = new Mob(this.data.getRandomMobName(this.mobNameList()));
+        mob.id = player;
+        this.mobs[player] = mob;
     }
 
     executeAction (locationId, actionId) {
@@ -47,9 +55,9 @@ class GameManager {
     endTurn () {
         const nextMob = this.turnOrder[this.turn % this.turnOrder.length];
         this.activeMob = this.mobs[nextMob];
-        console.log('Turn ' + this.turn + '. Player: ' + this.activeMob.name);
         this.turn++;
         this.actionsTaken = 0;
+        console.log(`Turn ${this.turn} Player: ${this.activeMob.name}`);
     }
 
     getLocationDetail (id) {
@@ -121,8 +129,9 @@ class GameManager {
         });
 
         const gameState = {
+            gameStarted: this.gameStarted,
             turn: this.turn,
-            activeMob: this.activeMob.id,
+            activeMob: this.activeMob ? this.activeMob.id : null,
             actionsTaken: this.actionsTaken,
             actionLimit: this.actionsLimit,
             mobs: mobs,
@@ -130,6 +139,10 @@ class GameManager {
         }
 
         return gameState;
+    }
+
+    mobNameList () {
+        return _.map(this.mobs, (mob) => { return mob.name; });
     }
 }
 
