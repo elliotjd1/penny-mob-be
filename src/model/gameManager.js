@@ -33,6 +33,9 @@ class GameManager {
     }
 
     executeAction (sourcePlayer, locationId, actionId) {
+        if (!this.gameStarted) {
+            throw 'Game has not started yet.';
+        }
         if (this.activePlayer && sourcePlayer != this.activePlayer.id) {
             console.log(`${sourcePlayer} tried to action on ${this.activePlayer.id}'s turn`);
             throw 'It is not your turn, you cannot perform any action';
@@ -57,6 +60,9 @@ class GameManager {
     }
 
     endTurn (sourcePlayer) {
+        if (!this.gameStarted) {
+            throw 'Game has not started yet.';
+        }
         if (this.activePlayer && sourcePlayer != this.activePlayer.id) {
             throw 'It is not your turn, you cannot perform any action';
         }
