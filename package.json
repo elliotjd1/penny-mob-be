@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "config": "^3.2.4",
     "lodash": "^4.17.11",
     "socket.io": "^2.2.0"
   },
