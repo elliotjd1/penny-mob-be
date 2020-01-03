@@ -63,6 +63,8 @@ class Room {
             });
             if (!this.gm.gameStarted && this.readyToPlay) {
                 this.gm.startGame();
+            } else {
+                throw `Not enough players available to start game. ${this.minimumPlayers} needed. Or game has already started.`;
             }
         }
     }

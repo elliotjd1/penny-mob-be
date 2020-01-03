@@ -1,7 +1,7 @@
 const io = require('socket.io')();
 const config = require('config');
 const Room = require('./model/room');
-const defaultRoom = config.bypassLobbyBrowser ? 'testRoom' : 'waitingRoom';
+const defaultRoom = 'waitingRoom';
 const rooms = {
   testRoom: new Room('testRoom', '1234')
 }
@@ -15,30 +15,35 @@ io.on('connection', client => {
     mobName: null
   }
   console.log(`Establishing connection for ${player.id}...`);
-  client.join(defaultRoom);
-
+  emitPersonalNotification(`Welcome!`);
+  
   // In testing mode, automatically start the game as soon as enough players are ready.
   if (config.bypassLobbyBrowser) {
     try {
-      player.mobName = rooms.testRoom.joinRoom(player.id);
-      if (rooms[player.room].readyToPlay) {
+      joinRoom('testRoom');
+      if (rooms.testRoom.readyToPlay) {
         console.log('Automatically starting test game...');
         rooms[player.room].startGame();
       }
+      emitState();
     } catch (err) {
       emitError(err);
     }
+  } else {
+    client.join(defaultRoom);
+    emitRoomNotification(`${player.mobName} has joined the room!`);
+    emitState();
   }
-
-  emitPersonalNotification(`Welcome ${player.mobName}`);
-  emitState();
-  emitRoomNotification(`${player.mobName} has joined the room!`);
 
   client.on('createRoom', payload => {
     if (Object.keys(rooms).includes(payload.room)) {
       emitError(`Room "${payload.room} already exists."`);
       return;
     }
+    console.log(`${player.id} is creating room ${payload.room}...`);
+
+    rooms[payload.room] = new Room(payload.room, payload.password);
+    joinRoom(payload.room);
   });
 
   client.on('joinRoom', payload => {
@@ -46,33 +51,35 @@ io.on('connection', client => {
       emitError(`Room "${payload.room} does not exist."`);
       return;
     }
-    console.log(`${player.id} is joining room ${payload.room}...`);
-    try {
-      player.mobName = rooms[payload.room].joinRoom(player.id);
-      player.room = payload.room;
-      client.join(player.room);
-      emitRoomNotification(`${player.mobName} has joined the room!`);
-    } catch (err) {
-      console.error(`${player.id} could not join room ${payload.room}...`);
-      emitError(err);
-    }
 
-    
+    console.log(`${player.id} is joining room ${payload.room}...`);
+    joinRoom(payload.room);
   });
 
   client.on('leaveRoom', payload => {
     rooms[player.room].leaveRoom(player.id);
     client.join(defaultRoom);
     player.room = defaultRoom;
+    emitRoomNotification(`${player.mobName} has left the room.`);
+    emitPersonalNotification(`You have left the room.`);
   });
 
   client.on('startGame', payload => {
-
+    try {
+      rooms[player.room].startGame();
+      emitRoomNotification(`Game has started.`);
+    } catch (err) {
+      emitError(err);
+    }
   });
 
   client.on('restartGame', payload => {
-    rooms[player.room].restartGame();
-    emitRoomNotification(`Game has been restarted`);
+    try {
+      rooms[player.room].restartGame();
+      emitRoomNotification(`Game has been restarted.`);
+    } catch (err) {
+      emitError(err);
+    }
   });
 
 
@@ -114,20 +121,39 @@ io.on('connection', client => {
     }
   });
 
+
+  function joinRoom (room) {
+    try {
+      player.mobName = rooms[room].joinRoom(player.id);
+      player.room = room;
+      emitRoomNotification(`${player.mobName} has joined the room!`, room);
+      emitPersonalNotification(`You have joined ${room}, along with ${rooms[room].gm.mobNameList().filter(n => n != player.mobName).join(', ')}`);
+      client.join(player.room);
+    } catch (err) {
+      console.error(err);
+      console.error(`${player.id} could not join room ${room}...`);
+      emitError(err);
+    }
+  }
+
   function emitPersonalNotification (message) {
     client.emit('notification', {payload: message});
   }
 
-  function emitRoomNotification (message) {
-    io.in(player.room).emit('notification', {payload: message});
+  function emitRoomNotification (message, room) {
+    if (!room) {
+      room = player.room;
+    }
+    io.in(room).emit('notification', {payload: message});
   }
 
+  // TODO this should work for not only game state, but lobby browser and lobby states
   function emitState () {
     io.in(player.room).emit('state', {status: 'success', payload: rooms[player.room].gm.getState()});
   }
 
   function emitError (message) {
-    console.error(err);
+    console.error(message);
     client.emit('state', {status: 'error', payload: message});
   }
 });
