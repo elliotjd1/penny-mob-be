@@ -4,7 +4,7 @@ class Room {
     constructor (name, password) {
         this.name = name;
         this.password = password;
-        this.capacity = 2;
+        this.capacity = 4;
         this.minimumPlayers = 2;
         this.readyToPlay = false;
         this.gm = new GameManager();
@@ -43,6 +43,7 @@ class Room {
     }
 
     leaveRoom (userName) {
+        this.gm.removeMob(userName);
         const playerIndex = this.players.indexOf(userName);
         if (playerIndex > -1) {
             this.players.splice(playerIndex, 1);
@@ -51,11 +52,16 @@ class Room {
             this.readyToPlay = false;
         }
         if (this.gm.gameStarted) {
-            this.restartGame();
+            try {
+                this.restartGame();
+            } catch (err) {
+                console.error(err);
+            }
         }
     }
 
     restartGame () {
+        console.log('restarting game...');
         this.gm = new GameManager();
         if (this.players.length > 0) {
             this.players.forEach((player) => {
@@ -69,7 +75,17 @@ class Room {
         }
     }
 
-
+    getState () {
+        const roomState = {
+            name: this.name,
+            capacity: this.capacity,
+            minimumPlayers: this.minimumPlayers,
+            readyToPlay: this.readyToPlay,
+            players: this.gm.mobNameList()
+        }
+        console.log(roomState);
+        return roomState;
+    }
 }
 
 module.exports = Room;
