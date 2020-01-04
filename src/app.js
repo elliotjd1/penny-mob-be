@@ -1,4 +1,5 @@
 const io = require('socket.io')();
+const _ = require('lodash');
 const config = require('config');
 const Room = require('./model/room');
 const defaultRoom = 'waitingRoom';
@@ -12,7 +13,7 @@ io.on('connection', client => {
   const player = {
     id: client.id,
     room: defaultRoom,
-    mobName: null
+    mobName: client.id
   }
   console.log(`Establishing connection for ${player.id}...`);
   emitPersonalNotification(`Welcome!`);
@@ -31,7 +32,7 @@ io.on('connection', client => {
     }
   } else {
     client.join(defaultRoom);
-    emitRoomNotification(`${player.mobName} has joined the room!`);
+    emitRoomNotification(`${player.mobName} is looking for a game`);
     emitState();
   }
 
@@ -43,7 +44,10 @@ io.on('connection', client => {
     console.log(`${player.id} is creating room ${payload.room}...`);
 
     rooms[payload.room] = new Room(payload.room, payload.password);
+    emitPersonalNotification(`You have created room: ${payload.room}`);
     joinRoom(payload.room);
+    emitRoomNotification(`Room ${payload.room} has been created. ${rooms[payload.room].capacity - rooms[payload.room].players.length} spots remaining`, defaultRoom);
+    emitState();
   });
 
   client.on('joinRoom', payload => {
@@ -54,20 +58,29 @@ io.on('connection', client => {
 
     console.log(`${player.id} is joining room ${payload.room}...`);
     joinRoom(payload.room);
+    emitRoomNotification(`A player has joined ${payload.room}. ${rooms[payload.room].capacity - rooms[payload.room].players.length} spots remaining`, defaultRoom);
+    emitState();
   });
 
   client.on('leaveRoom', payload => {
-    rooms[player.room].leaveRoom(player.id);
-    client.join(defaultRoom);
-    player.room = defaultRoom;
-    emitRoomNotification(`${player.mobName} has left the room.`);
-    emitPersonalNotification(`You have left the room.`);
+    try {
+      rooms[player.room].leaveRoom(player.id);
+      emitRoomNotification(`${player.mobName} has left the room.`);
+      emitPersonalNotification(`You have left ${player.room}.`);
+      client.leave(player.room);
+      client.join(defaultRoom);
+      player.room = defaultRoom;
+      emitState();
+    } catch (err) {
+      emitPersonalNotification(`You cannot leave this room`);
+    }
   });
 
   client.on('startGame', payload => {
     try {
       rooms[player.room].startGame();
       emitRoomNotification(`Game has started.`);
+      emitState();
     } catch (err) {
       emitError(err);
     }
@@ -77,6 +90,7 @@ io.on('connection', client => {
     try {
       rooms[player.room].restartGame();
       emitRoomNotification(`Game has been restarted.`);
+      emitState();
     } catch (err) {
       emitError(err);
     }
@@ -125,6 +139,7 @@ io.on('connection', client => {
   function joinRoom (room) {
     try {
       player.mobName = rooms[room].joinRoom(player.id);
+      client.leave(player.room);
       player.room = room;
       emitRoomNotification(`${player.mobName} has joined the room!`, room);
       emitPersonalNotification(`You have joined ${room}, along with ${rooms[room].gm.mobNameList().filter(n => n != player.mobName).join(', ')}`);
@@ -147,9 +162,27 @@ io.on('connection', client => {
     io.in(room).emit('notification', {payload: message});
   }
 
-  // TODO this should work for not only game state, but lobby browser and lobby states
+
   function emitState () {
-    io.in(player.room).emit('state', {status: 'success', payload: rooms[player.room].gm.getState()});
+    if (player.room != defaultRoom) {
+      if (rooms[player.room].gm.gameStarted) {
+        io.in(player.room).emit('state', {status: 'success', payload: rooms[player.room].gm.getState()});
+      } else {
+        io.in(player.room).emit('state', {status: 'success', payload: {
+          state: 'lobby', room: rooms[player.room].getState()
+        }});
+      }
+    } else {
+      io.in(player.room).emit('state', {
+        status: 'success', 
+        payload: {
+          state: 'lobbyBrowser',
+          rooms: _.map(rooms, (room) => {
+            return room.getState();
+          })
+        }
+      });
+    }
   }
 
   function emitError (message) {
