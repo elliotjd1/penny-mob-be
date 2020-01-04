@@ -32,6 +32,10 @@ class GameManager {
         this.mobs[player] = mob;
     }
 
+    removeMob (player) {
+        delete this.mobs[player];
+    }
+
     executeAction (sourcePlayer, locationId, actionId) {
         if (!this.gameStarted) {
             throw 'Game has not started yet.';
@@ -142,6 +146,7 @@ class GameManager {
         });
 
         const gameState = {
+            state: 'game',
             gameStarted: this.gameStarted,
             turn: this.turn,
             activePlayer: this.activePlayer ? this.activePlayer.id : null,
