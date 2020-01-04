@@ -9,7 +9,7 @@ const rooms = {
 
 
 io.origins(['*:*']);
-io.on('connection', client => { 
+io.on('connection', client => {
   const player = {
     id: client.id,
     room: defaultRoom,
@@ -17,7 +17,7 @@ io.on('connection', client => {
   }
   console.log(`Establishing connection for ${player.id}...`);
   emitPersonalNotification(`Welcome!`);
-  
+
   // In testing mode, automatically start the game as soon as enough players are ready.
   if (config.bypassLobbyBrowser) {
     try {
@@ -100,7 +100,7 @@ io.on('connection', client => {
   client.on('locationSelect', payload => {
     console.log('fetching location information')
     console.log(payload);
-    
+
     try {
       const location = rooms[player.room].gm.getLocationDetail(player.id, payload.location);
       client.emit('locationServe', {status: 'success', payload: location});
@@ -124,8 +124,6 @@ io.on('connection', client => {
 
 
   client.on('endTurn', payload => {
-    console.log(payload);
-
     try {
       rooms[player.room].gm.endTurn(player.id);
       emitState();
@@ -166,21 +164,16 @@ io.on('connection', client => {
   function emitState () {
     if (player.room != defaultRoom) {
       if (rooms[player.room].gm.gameStarted) {
-        io.in(player.room).emit('state', {status: 'success', payload: rooms[player.room].gm.getState()});
+        io.in(player.room).emit('state', {status: 'success', state: 'game', payload: rooms[player.room].gm.getState()});
       } else {
-        io.in(player.room).emit('state', {status: 'success', payload: {
-          state: 'lobby', room: rooms[player.room].getState()
-        }});
+        io.in(player.room).emit('state', {status: 'success', state: 'lobby', payload: rooms[player.room].getState()});
       }
     } else {
       io.in(player.room).emit('state', {
-        status: 'success', 
-        payload: {
-          state: 'lobbyBrowser',
-          rooms: _.map(rooms, (room) => {
-            return room.getState();
-          })
-        }
+        status: 'success', state: 'lobbyBrowser',
+        payload:  _.map(rooms, (room) => {
+          return room.getState();
+        })
       });
     }
   }

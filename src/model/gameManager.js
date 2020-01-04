@@ -59,7 +59,7 @@ class GameManager {
         if (!action) { // TODO check that action is valid for current mob in this location
             throw 'Action is not valid for this location/mob.';
         }
-        
+
         action.execute(location, this.activePlayer);
     }
 
@@ -146,7 +146,6 @@ class GameManager {
         });
 
         const gameState = {
-            state: 'game',
             gameStarted: this.gameStarted,
             turn: this.turn,
             activePlayer: this.activePlayer ? this.activePlayer.id : null,
