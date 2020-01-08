@@ -65,13 +65,17 @@ io.on('connection', client => {
   client.on('leaveRoom', payload => {
     try {
       rooms[player.room].leaveRoom(player.id);
-      emitRoomNotification(`${player.mobName} has left the room.`);
+      emitExclusiveRoomNotification(`${player.mobName} has left the room.`);
       emitPersonalNotification(`You have left ${player.room}.`);
       client.leave(player.room);
+      if (rooms[player.room].players.length == 0 && (rooms[player.room].gm.gameOver || !rooms[player.room].gm.gameStarted)) {
+        delete rooms[player.room];
+      }
       client.join(defaultRoom);
       player.room = defaultRoom;
       emitState();
     } catch (err) {
+      console.error(err);
       emitPersonalNotification(`You cannot leave this room`);
     }
   });
@@ -117,6 +121,8 @@ io.on('connection', client => {
     try {
       rooms[player.room].gm.executeAction(player.id, payload.location, payload.action);
       emitState();
+      emitPersonalNotification(`You have succesfully "${payload.action}" in ${payload.location}`);
+      emitExclusiveRoomNotification(`${player.mobName} has "${payload.action}" in ${payload.location}`);
     } catch (err) {
       emitError(err);
     }
@@ -139,9 +145,9 @@ io.on('connection', client => {
       player.mobName = rooms[room].joinRoom(player.id);
       client.leave(player.room);
       player.room = room;
-      emitRoomNotification(`${player.mobName} has joined the room!`, room);
-      emitPersonalNotification(`You have joined ${room}, along with ${rooms[room].gm.mobNameList().filter(n => n != player.mobName).join(', ')}`);
       client.join(player.room);
+      emitPersonalNotification(`You have joined ${room}, along with ${rooms[room].gm.mobNameList().filter(n => n != player.mobName).join(', ')}`);
+      emitExclusiveRoomNotification(`${player.mobName} has joined the room!`, room);
     } catch (err) {
       console.error(err);
       console.error(`${player.id} could not join room ${room}...`);
@@ -158,6 +164,13 @@ io.on('connection', client => {
       room = player.room;
     }
     io.in(room).emit('notification', {payload: message});
+  }
+
+  function emitExclusiveRoomNotification (message, room) {
+    if (!room) {
+      room = player.room;
+    }
+    client.to(room).emit('notification', {payload: message});
   }
 
 
