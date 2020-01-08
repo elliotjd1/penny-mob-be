@@ -51,13 +51,6 @@ class Room {
         if (this.players.length < this.minimumPlayers) {
             this.readyToPlay = false;
         }
-        if (this.gm.gameStarted) {
-            try {
-                this.restartGame();
-            } catch (err) {
-                console.error(err);
-            }
-        }
     }
 
     restartGame () {
