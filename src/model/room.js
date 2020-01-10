@@ -70,12 +70,16 @@ class Room {
 
     getState () {
         const roomState = {
-            name: this.name,
-            capacity: this.capacity,
-            minimumPlayers: this.minimumPlayers,
-            readyToPlay: this.readyToPlay,
-            players: this.players,
-            mobs: this.gm.mobNameList()
+          name: this.name,
+          capacity: this.capacity,
+          minimumPlayers: this.minimumPlayers,
+          readyToPlay: this.readyToPlay,
+          players: this.players.map((player) => {
+            return {
+              userName: player,
+              mobName: this.gm.mobs[player].name
+            }
+          })
         }
         console.log(roomState);
         return roomState;
