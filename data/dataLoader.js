@@ -35,7 +35,7 @@ class DataLoader {
         this.mobNames = [
             `Mobbo`,
             `Gregor's Gits`,
-            `The Lads`,
+            `The Mad Lads`,
             `Pollokshields Pillocks`,
             `Briggy Bishops`,
             `Barrow Wights`,

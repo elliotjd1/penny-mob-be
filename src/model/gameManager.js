@@ -7,7 +7,9 @@ class GameManager {
     constructor () {
         this.turn = 0;
         this.gameStarted = false;
+        this.gameOver = false;
         this.activePlayer = null;
+        this.winningPlayer = null;
         this.turnOrder = [];
         this.actionsTaken = 0;
         this.actionsLimit = 3;
@@ -21,6 +23,7 @@ class GameManager {
         console.log('Starting new game...');
         console.log(`Players: ${this.mobNameList().join(', ')}`)
         this.gameStarted = true;
+        this.gameOver = false;
         const players = Object.keys(this.mobs);
         this.turnOrder = _.shuffle(players);
         this.endTurn();
@@ -32,7 +35,17 @@ class GameManager {
         this.mobs[player] = mob;
     }
 
+    removeMob (player) {
+        delete this.mobs[player];
+    }
+
     executeAction (sourcePlayer, locationId, actionId) {
+        if (!this.gameStarted) {
+            throw 'Game has not started yet.';
+        }
+        if (this.gameOver) {
+          throw 'Game has ended.';
+        }
         if (this.activePlayer && sourcePlayer != this.activePlayer.id) {
             console.log(`${sourcePlayer} tried to action on ${this.activePlayer.id}'s turn`);
             throw 'It is not your turn, you cannot perform any action';
@@ -52,11 +65,17 @@ class GameManager {
         if (!action) { // TODO check that action is valid for current mob in this location
             throw 'Action is not valid for this location/mob.';
         }
-        
+
         action.execute(location, this.activePlayer);
     }
 
     endTurn (sourcePlayer) {
+        if (!this.gameStarted) {
+            throw 'Game has not started yet.';
+        }
+        if (this.gameOver) {
+          throw 'Game has ended.';
+        }
         if (this.activePlayer && sourcePlayer != this.activePlayer.id) {
             throw 'It is not your turn, you cannot perform any action';
         }
@@ -65,6 +84,10 @@ class GameManager {
         this.turn++;
         this.actionsTaken = 0;
         console.log(`Turn ${this.turn} Player: ${this.activePlayer.name}`);
+    }
+
+    endGame () {
+      this.gameOver = true;
     }
 
     getLocationDetail (sourcePlayer, id) {
@@ -137,8 +160,10 @@ class GameManager {
 
         const gameState = {
             gameStarted: this.gameStarted,
+            gameOver: this.gameOver,
             turn: this.turn,
             activePlayer: this.activePlayer ? this.activePlayer.id : null,
+            winningPlayer: this.winningPlayer ? this.winningPlayer.id : null,
             actionsTaken: this.actionsTaken,
             actionLimit: this.actionsLimit,
             mobs: mobs,
