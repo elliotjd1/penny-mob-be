@@ -84,6 +84,10 @@ class Room {
         console.log(roomState);
         return roomState;
     }
+
+    getMobName (playerId) {
+      return this.gm.mobs[playerId].name;
+    }
 }
 
 module.exports = Room;
