@@ -74,7 +74,8 @@ class Room {
             capacity: this.capacity,
             minimumPlayers: this.minimumPlayers,
             readyToPlay: this.readyToPlay,
-            players: this.gm.mobNameList()
+            players: this.players,
+            mobs: this.gm.mobNameList()
         }
         console.log(roomState);
         return roomState;
