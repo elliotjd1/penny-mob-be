@@ -22,35 +22,41 @@ class Room {
     }
 
     joinRoom (userName) {
-        console.log(`${userName} is joining ${this.name}`);
-        if (this.gm.gameStarted) {
-            throw `Game has already started, get out.`;
+      console.log(`${userName} is joining ${this.name}`);
+      if (this.gm.gameStarted) {
+        if(!this.gm.mobs[userName]) {
+          throw `Game has already started, get out.`;
         }
+        this.players.push(userName);
+      } else {
         if (this.players.length >= this.capacity) {
-            throw `Game is full (maximum ${this.capacity} players).`;
+          throw `Game is full (maximum ${this.capacity} players).`;
         }
         if (!this.players.includes(userName)) {
-            this.players.push(userName);
-            this.gm.addMob(userName);
-            console.log(`${userName} has been added to ${this.name}`);
+          this.players.push(userName);
+          this.gm.addMob(userName);
+          console.log(`${userName} has been added to ${this.name}`);
         }
         if (this.players.length >= this.minimumPlayers) {
-            console.log(`${this.name} now has enough players to begin.`);
-            this.readyToPlay = true;
+          console.log(`${this.name} now has enough players to begin.`);
+          this.readyToPlay = true;
         }
+      }
 
-        return this.gm.mobs[userName].name;
+      return this.getMobName(userName);
     }
 
     leaveRoom (userName) {
+      if (!this.gm.gameStarted) {
         this.gm.removeMob(userName);
-        const playerIndex = this.players.indexOf(userName);
-        if (playerIndex > -1) {
-            this.players.splice(playerIndex, 1);
-        }
-        if (this.players.length < this.minimumPlayers) {
-            this.readyToPlay = false;
-        }
+      }
+      const playerIndex = this.players.indexOf(userName);
+      if (playerIndex > -1) {
+          this.players.splice(playerIndex, 1);
+      }
+      if (this.players.length < this.minimumPlayers) {
+          this.readyToPlay = false;
+      }
     }
 
     restartGame () {
@@ -74,7 +80,7 @@ class Room {
           capacity: this.capacity,
           minimumPlayers: this.minimumPlayers,
           readyToPlay: this.readyToPlay,
-          players: this.players.map((player) => {
+          players: Object.keys(this.gm.mobs).map((player) => {
             return {
               userName: player,
               mobName: this.gm.mobs[player].name
