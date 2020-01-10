@@ -2,21 +2,22 @@ const io = require('socket.io')();
 const _ = require('lodash');
 const config = require('config');
 const Room = require('./model/room');
+const Player = require('./model/player');
 const defaultRoom = 'waitingRoom';
 const rooms = {
   testRoom: new Room('testRoom', '1234')
 }
+const players = {}
 
 
 io.origins(['*:*']);
 io.on('connection', client => {
   const player = {
     id: client.id,
-    room: defaultRoom,
-    mobName: client.id
+    room: defaultRoom
   }
   console.log(`Establishing connection for ${player.id}...`);
-  emitPersonalNotification(`Welcome!`);
+  emitPersonalNotification(`...Penny Mob...`);
 
   // In testing mode, automatically start the game as soon as enough players are ready.
   if (config.bypassLobbyBrowser) {
@@ -32,9 +33,17 @@ io.on('connection', client => {
     }
   } else {
     client.join(defaultRoom);
-    emitRoomNotification(`${player.mobName} is looking for a game`);
+    emitRoomNotification(`${player.id} is looking for a game`);
     emitState();
   }
+
+  client.on('login', payload => {
+    if (!players[payload.userName]) {
+      players[payload.userName] = new Player(client.id, payload.userName, payload.password);
+    }
+    player.id = payload.userName;
+    emitPersonalNotification(`Welcome ${player.id}!`);
+  });
 
   client.on('createRoom', payload => {
     if (Object.keys(rooms).includes(payload.room)) {
@@ -65,7 +74,7 @@ io.on('connection', client => {
   client.on('leaveRoom', payload => {
     try {
       rooms[player.room].leaveRoom(player.id);
-      emitExclusiveRoomNotification(`${player.mobName} has left the room.`);
+      emitExclusiveRoomNotification(`${player.id} has left the room.`);
       emitPersonalNotification(`You have left ${player.room}.`);
       client.leave(player.room);
       if (rooms[player.room].players.length == 0 && (rooms[player.room].gm.gameOver || !rooms[player.room].gm.gameStarted)) {
@@ -122,7 +131,7 @@ io.on('connection', client => {
       rooms[player.room].gm.executeAction(player.id, payload.location, payload.action);
       emitState();
       emitPersonalNotification(`You have succesfully "${payload.action}" in ${payload.location}`);
-      emitExclusiveRoomNotification(`${player.mobName} has "${payload.action}" in ${payload.location}`);
+      emitExclusiveRoomNotification(`${rooms[player.room].getMobName(player.id)} has "${payload.action}" in ${payload.location}`);
     } catch (err) {
       emitError(err);
     }
@@ -142,12 +151,12 @@ io.on('connection', client => {
 
   function joinRoom (room) {
     try {
-      player.mobName = rooms[room].joinRoom(player.id);
       client.leave(player.room);
       player.room = room;
       client.join(player.room);
-      emitPersonalNotification(`You have joined ${room}, along with ${rooms[room].gm.mobNameList().filter(n => n != player.mobName).join(', ')}`);
-      emitExclusiveRoomNotification(`${player.mobName} has joined the room!`, room);
+      rooms[player.room].joinRoom(player.id);
+      emitPersonalNotification(`You have joined ${room}`);
+      emitExclusiveRoomNotification(`${rooms[player.room].getMobName(player.id)} (${player.id}) has joined the room!`, room);
     } catch (err) {
       console.error(err);
       console.error(`${player.id} could not join room ${room}...`);
